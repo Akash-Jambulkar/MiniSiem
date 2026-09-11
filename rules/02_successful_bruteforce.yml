@@ -1,0 +1,17 @@
+id: successful_bruteforce
+name: Successful Brute Force
+description: "5 or more failed SSH logins followed by 1 or more accepted logins from the same IP within 120s."
+severity: critical
+mitre: T1110
+mitre_tactic: TA0006
+references:
+  - https://attack.mitre.org/techniques/T1110/
+logic:
+  type: conditional
+  match:
+    event_type: ssh_failed_login
+  follow_match:
+    event_type: ssh_accepted_login
+  group_by: source_ip
+  window_seconds: 120
+  threshold: 5

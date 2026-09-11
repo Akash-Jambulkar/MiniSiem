@@ -1,0 +1,16 @@
+id: ssh_bruteforce
+name: SSH Brute Force
+description: "5 or more failed SSH logins from the same source IP in a 60-second window."
+severity: high
+mitre: T1110.001
+mitre_tactic: TA0006  # Credential Access
+references:
+  - https://attack.mitre.org/techniques/T1110/001/
+  - https://docs.crowdsec.net/docs/scenarios/format/
+logic:
+  type: threshold
+  match:
+    event_type: ssh_failed_login
+  group_by: source_ip
+  window_seconds: 60
+  threshold: 5

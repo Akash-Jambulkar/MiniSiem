@@ -1,0 +1,12 @@
+id: new_user_after_login
+name: Account Created After Remote Login
+description: Local user account created shortly after a remote SSH login (persistence).
+severity: high
+mitre: T1136.001
+mitre_tactic: TA0003  # Persistence
+references:
+  - https://attack.mitre.org/techniques/T1136/001/
+logic:
+  type: field_match
+  match:
+    event_type: user_created

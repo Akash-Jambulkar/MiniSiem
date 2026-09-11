@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run pytest
+        run: pytest tests/ -v
+      - name: Smoke-test pipeline on sample data
+        run: |
+          python -m src.main --input data/samples/auth.log --source ssh --no-enrich
+          python -m src.main --input data/samples/nginx_access.log --source nginx --no-enrich
+          python -m src.main --input data/samples/cowrie.json --source cowrie --no-enrich

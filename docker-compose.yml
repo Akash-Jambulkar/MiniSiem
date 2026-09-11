@@ -1,0 +1,30 @@
+services:
+  pipeline:
+    build: .
+    container_name: mini-siem-pipeline
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./rules:/app/rules
+    command: >
+      python -m src.main
+      --input data/samples/auth.log
+      --source ssh
+      --no-enrich
+
+  dashboard:
+    build: .
+    container_name: mini-siem-dashboard
+    env_file: .env
+    depends_on:
+      - pipeline
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./rules:/app/rules
+    command: >
+      streamlit run src/dashboard/app.py
+      --server.address=0.0.0.0
+      --server.port=8501
+      --server.headless=true

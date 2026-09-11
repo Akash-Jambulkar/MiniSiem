@@ -1,0 +1,13 @@
+id: web_admin_probe
+name: Sensitive Path Probing
+description: Requests to sensitive admin / secret paths that commonly indicate reconnaissance.
+severity: medium
+mitre: T1595.003
+mitre_tactic: TA0043
+references:
+  - https://attack.mitre.org/techniques/T1595/003/
+logic:
+  type: field_match
+  match:
+    http_path:
+      regex: "(\\.env|/wp-admin|/phpmyadmin|/\\.git/|/admin/config|/boaform|/actuator)"

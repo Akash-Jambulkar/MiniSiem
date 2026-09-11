@@ -1,0 +1,46 @@
+# --- Secrets ---
+.env
+.env.local
+*.pem
+*.key
+credentials.json
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# --- Data ---
+data/raw/
+data/output/
+*.log
+!data/samples/*.log
+!docs/sample_run.log
+mini_siem.db
+enrichment_cache.sqlite
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# --- Docker / logs ---
+elasticsearch_data/
+kibana_data/
+cowrie_data/

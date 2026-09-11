@@ -1,0 +1,14 @@
+id: attacker_recon_command
+name: Post-Compromise Recon Command
+description: Attacker recon commands issued inside a Cowrie session (uname, wget, curl, whoami).
+severity: high
+mitre: T1082
+mitre_tactic: TA0007  # Discovery
+references:
+  - https://attack.mitre.org/techniques/T1082/
+logic:
+  type: field_match
+  match:
+    event_type: attacker_command
+    command:
+      regex: "(uname\\s-a|whoami|id|cat /etc/passwd|wget |curl |chmod \\+x)"
