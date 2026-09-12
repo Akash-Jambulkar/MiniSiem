@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mini-SIEM — Log Analysis &amp; Threat Detection Pipeline</title>
+  <meta name="description" content="A Python-based mini SIEM: honeypot-fed detection pipeline mapped to MITRE ATT&amp;CK, with threat-intel enrichment, real-time alerting, and a Streamlit dashboard." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="hero">
+    <nav class="nav">
+      <span class="brand">🛡️ Mini-SIEM</span>
+      <div class="nav-links">
+        <a href="#architecture">Architecture</a>
+        <a href="#rules">Detections</a>
+        <a href="#incident">Incident</a>
+        <a href="#stack">Stack</a>
+        <a href="#run">Run it</a>
+        <a class="cta" href="https://github.com/Akash-Jambulkar/MiniSiem" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </nav>
+
+    <div class="hero-content">
+      <div class="badge">Cybersecurity portfolio project</div>
+      <h1>A mini-SIEM that <span class="hl">catches attackers</span><br />in real time — built in Python.</h1>
+      <p class="lead">
+        Log ingestion, parsing, sliding-window detection rules mapped to
+        <b>MITRE ATT&amp;CK</b>, IP enrichment via <b>AbuseIPDB</b>, and
+        <b>Slack / Discord</b> alerts — all packaged in Docker with a live
+        <b>Streamlit</b> dashboard.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="https://github.com/Akash-Jambulkar/MiniSiem" target="_blank" rel="noopener">View source on GitHub</a>
+        <a class="btn ghost" href="#incident">See a sample incident</a>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><span class="num">8</span><span class="label">Detection rules</span></div>
+        <div class="kpi"><span class="num">3</span><span class="label">Log sources</span></div>
+        <div class="kpi"><span class="num">15</span><span class="label">Unit tests · all green</span></div>
+        <div class="kpi"><span class="num">MITRE</span><span class="label">ATT&amp;CK mapped</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section id="architecture" class="section">
+    <h2>How it works</h2>
+    <p class="sub">Five composable stages — the same loop every SIEM (Splunk, Sentinel, Wazuh, ELK) implements. Rebuilt from scratch so the internals are visible.</p>
+
+    <div class="pipeline">
+      <div class="stage">
+        <div class="dot">1</div>
+        <h3>Collect</h3>
+        <p>Batch read a file or tail it like <code>tail -f</code>. Sources: Linux <code>auth.log</code>, nginx access log, Cowrie honeypot JSON.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="stage">
+        <div class="dot">2</div>
+        <h3>Parse</h3>
+        <p>Regex &amp; JSON parsers normalise every event to an ECS-flavoured envelope: <code>timestamp</code>, <code>source_ip</code>, <code>event_type</code>, <code>user</code>.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="stage">
+        <div class="dot">3</div>
+        <h3>Detect</h3>
+        <p>YAML rule engine with four rule types: <code>threshold</code>, <code>distinct_users</code>, <code>conditional</code>, <code>field_match</code>. Sliding windows + cooldowns.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="stage">
+        <div class="dot">4</div>
+        <h3>Enrich</h3>
+        <p>AbuseIPDB reputation lookup with an SQLite cache — respects the 1,000-req/day free tier.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="stage">
+        <div class="dot">5</div>
+        <h3>Alert</h3>
+        <p>Console (Rich), Slack Block Kit, Discord embeds, JSONL log for the dashboard.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules" class="section alt">
+    <h2>Detections mapped to MITRE ATT&amp;CK</h2>
+    <p class="sub">Every rule is a plain YAML file — no code changes needed to add or tune.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rule ID</th><th>Logic</th><th>Source</th><th>Severity</th><th>MITRE technique</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>ssh_bruteforce</code></td><td>≥5 failed SSH logins / IP / 60s</td><td>auth.log</td><td><span class="sev high">HIGH</span></td><td>T1110.001 · Password Guessing</td></tr>
+          <tr><td><code>successful_bruteforce</code></td><td>≥5 fails then ≥1 success / IP / 120s</td><td>auth.log</td><td><span class="sev crit">CRITICAL</span></td><td>T1110 + T1078 · Valid Accounts</td></tr>
+          <tr><td><code>password_spraying</code></td><td>≥10 distinct usernames / IP / 10 min</td><td>auth.log</td><td><span class="sev high">HIGH</span></td><td>T1110.003 · Password Spraying</td></tr>
+          <tr><td><code>web_credential_stuffing</code></td><td>≥20 POST /login 401/403 / IP / 60s</td><td>nginx</td><td><span class="sev high">HIGH</span></td><td>T1110.004 · Credential Stuffing</td></tr>
+          <tr><td><code>suspicious_user_agent</code></td><td>UA = sqlmap/nikto/nmap/hydra/…</td><td>nginx</td><td><span class="sev med">MEDIUM</span></td><td>T1595 · Active Scanning</td></tr>
+          <tr><td><code>web_admin_probe</code></td><td>path = .env / /wp-admin / /.git / …</td><td>nginx</td><td><span class="sev med">MEDIUM</span></td><td>T1595.003 · Wordlist Scanning</td></tr>
+          <tr><td><code>new_user_after_login</code></td><td><code>useradd</code> shortly after remote login</td><td>auth.log</td><td><span class="sev high">HIGH</span></td><td>T1136.001 · Create Account</td></tr>
+          <tr><td><code>attacker_recon_command</code></td><td>whoami / wget / cat /etc/passwd</td><td>cowrie</td><td><span class="sev high">HIGH</span></td><td>T1082 · Info Discovery</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="incident" class="section">
+    <h2>Sample incident — full compromise in 90 seconds</h2>
+    <p class="sub">Running the pipeline against the bundled sample logs produces this 4-alert kill chain — a realistic SOC narrative.</p>
+
+    <ol class="timeline">
+      <li>
+        <div class="t-time">02:14:08</div>
+        <div class="t-body">
+          <span class="sev high">HIGH</span>
+          <b>ssh_bruteforce</b> · T1110.001
+          <p><code>203.0.113.42</code> triggered 5 failed SSH logins in the first 10 seconds of a 20-attempt burst.</p>
+        </div>
+      </li>
+      <li>
+        <div class="t-time">02:14:45</div>
+        <div class="t-body">
+          <span class="sev crit">CRITICAL</span>
+          <b>successful_bruteforce</b> · T1110 + T1078
+          <p>Same IP successfully authenticated as <code>root</code> after 20 failures — attacker is in.</p>
+        </div>
+      </li>
+      <li>
+        <div class="t-time">02:15:30</div>
+        <div class="t-body">
+          <span class="sev high">HIGH</span>
+          <b>new_user_after_login</b> · T1136.001
+          <p><code>useradd svcbackup</code> UID 0 — persistence via backdoor account.</p>
+        </div>
+      </li>
+      <li>
+        <div class="t-time">02:22–02:26</div>
+        <div class="t-body">
+          <span class="sev high">HIGH</span>
+          <b>password_spraying</b> · T1110.003
+          <p>Separate IP <code>198.51.100.17</code> sprayed 13 distinct usernames — different attacker, different technique.</p>
+        </div>
+      </li>
+    </ol>
+    <p class="callout">
+      ~35 interleaved log lines → <b>4 prioritised alerts</b>, each tagged with
+      a MITRE technique. That's the value a SIEM adds every day.
+    </p>
+  </section>
+
+  <section id="stack" class="section alt">
+    <h2>The stack</h2>
+    <div class="stack-grid">
+      <div class="s-card"><h4>Language</h4><p>Python 3.11+, regex, pandas</p></div>
+      <div class="s-card"><h4>Rules</h4><p>PyYAML — detection-as-code</p></div>
+      <div class="s-card"><h4>Enrichment</h4><p>AbuseIPDB API + SQLite cache</p></div>
+      <div class="s-card"><h4>Alerting</h4><p>Rich console, Slack Block Kit, Discord embeds</p></div>
+      <div class="s-card"><h4>Dashboard</h4><p>Streamlit + Plotly</p></div>
+      <div class="s-card"><h4>Packaging</h4><p>Docker + Docker Compose</p></div>
+      <div class="s-card"><h4>Testing</h4><p>pytest — 15/15 green</p></div>
+      <div class="s-card"><h4>Log sources</h4><p>Linux auth.log, nginx/apache, Cowrie honeypot</p></div>
+    </div>
+  </section>
+
+  <section id="run" class="section">
+    <h2>Run it in 60 seconds</h2>
+    <pre class="code"><code><span class="c">$ </span>git clone https://github.com/Akash-Jambulkar/MiniSiem
+<span class="c">$ </span>cd MiniSiem
+<span class="c">$ </span>cp .env.example .env       <span class="cmt"># (optional) add ABUSEIPDB_API_KEY / SLACK_WEBHOOK_URL</span>
+<span class="c">$ </span>docker compose up --build  <span class="cmt"># pipeline + dashboard on :8501</span>
+
+<span class="c">$ </span><span class="cmt"># or natively:</span>
+<span class="c">$ </span>pip install -r requirements.txt
+<span class="c">$ </span>python -m src.main --input data/samples/auth.log --source ssh --no-enrich
+<span class="c">$ </span>streamlit run src/dashboard/app.py</code></pre>
+
+    <p class="sub"><b>Safe by default:</b> bundled samples use RFC-5737 <code>TEST-NET</code> IPs. No secrets committed. Honeypot exposure only on isolated VMs.</p>
+  </section>
+
+  <section class="section alt">
+    <h2>Skills demonstrated</h2>
+    <div class="skills">
+      <span class="chip">SIEM design</span>
+      <span class="chip">MITRE ATT&amp;CK</span>
+      <span class="chip">Detection engineering</span>
+      <span class="chip">Threat intelligence</span>
+      <span class="chip">Log parsing</span>
+      <span class="chip">Python</span>
+      <span class="chip">Regex</span>
+      <span class="chip">pandas</span>
+      <span class="chip">Docker</span>
+      <span class="chip">Streamlit</span>
+      <span class="chip">Slack / Discord APIs</span>
+      <span class="chip">pytest</span>
+      <span class="chip">YAML rules-as-code</span>
+      <span class="chip">Incident response</span>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>Built by <b>Akash Jambulkar</b> · <a href="https://github.com/Akash-Jambulkar/MiniSiem" target="_blank" rel="noopener">github.com/Akash-Jambulkar/MiniSiem</a></p>
+    <p class="sub">Only test systems you own. Sample IPs are RFC-5737 TEST-NET ranges. Never commit real logs or secrets.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
