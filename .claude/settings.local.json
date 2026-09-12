@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "PowerShell(git config --global --list)",
-      "PowerShell(git config --list)",
-      "PowerShell(& \"$env:LOCALAPPDATA\\\\GitCredentialManager\\\\git-credential-manager.exe\" github logout akashjambulkar2-cyber 2>&1; if \\($LASTEXITCODE -ne 0\\) { Write-Output \"GCM path not found, trying git-credential-manager on PATH\"; git-credential-manager github logout akashjambulkar2-cyber 2>&1 })"
-    ]
-  }
-}
