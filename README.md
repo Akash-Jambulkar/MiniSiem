@@ -17,7 +17,7 @@ dashboard — all reproducible with **Docker Compose**.
 ## 🎬 Demo — one command to see it work
 
 ```bash
-git clone https://github.com/akashjambulkar2-cyber/MiniSiem
+git clone https://github.com/Akash-Jambulkar/MiniSiem
 cd MiniSiem
 cp .env.example .env       # (optional) fill in ABUSEIPDB_API_KEY / SLACK_WEBHOOK_URL
 docker compose up --build
