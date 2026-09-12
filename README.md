@@ -17,8 +17,8 @@ dashboard — all reproducible with **Docker Compose**.
 ## 🎬 Demo — one command to see it work
 
 ```bash
-git clone https://github.com/<you>/mini-siem
-cd mini-siem
+git clone https://github.com/akashjambulkar2-cyber/MiniSiem
+cd MiniSiem
 cp .env.example .env       # (optional) fill in ABUSEIPDB_API_KEY / SLACK_WEBHOOK_URL
 docker compose up --build
 ```
@@ -77,7 +77,7 @@ Rules are plain YAML (`rules/*.yml`) — add your own without touching Python.
 ## 📁 Repository layout
 
 ```
-mini-siem/
+MiniSiem/
 ├── README.md                 ← you are here
 ├── .gitignore                ← .env, raw logs, caches
 ├── .env.example              ← API-key template (no secrets)
