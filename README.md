@@ -7,7 +7,7 @@ honeypot logs, parses them into a structured schema, runs a rule engine mapped t
 fires alerts to **Slack / Discord**, and visualises the results on a **Streamlit**
 dashboard — all reproducible with **Docker Compose**.
 
-
+https://akash-jambulkar.github.io/MiniSiem/
 ---
 
 ## 🎬 Demo — one command to see it work
