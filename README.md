@@ -7,10 +7,6 @@ honeypot logs, parses them into a structured schema, runs a rule engine mapped t
 fires alerts to **Slack / Discord**, and visualises the results on a **Streamlit**
 dashboard — all reproducible with **Docker Compose**.
 
-> **Why this project?** Entry-level SOC roles demand SIEM familiarity, log analysis,
-> MITRE ATT&CK mapping, incident response and Python scripting. Building the pipeline
-> from scratch teaches the *internals* of Splunk / Sentinel / Wazuh and produces a
-> tangible portfolio artefact that hiring managers can actually run.
 
 ---
 
